@@ -15,4 +15,4 @@ RUN poetry install --no-root
 
 COPY . .
 
-CMD ["fastapi", "run", "routes.py", "--port", "80"]
+CMD ["fastapi", "run", "main.py", "--port", "80"]
