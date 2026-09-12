@@ -2,7 +2,6 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from jose import jwt, JWTError, ExpiredSignatureError
-from urllib3.util.util import to_str
 
 from security.interfaces import JWTAuthManagerInterface
 

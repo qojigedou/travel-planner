@@ -4,19 +4,21 @@ from typing import Generator
 import os
 from dotenv import load_dotenv
 from contextlib import contextmanager
+from config import get_settings
 
 settings = get_settings()
 
-POSTGRESQL_DB_URL = os.getenv("POSTGRESQL_DB_URL")
+POSTGRESQL_DB_URL = (f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@"
+                           f"{settings.POSTGRES_HOST}:{settings.POSTGRES_DB_PORT}/{settings.POSTGRES_DB}")
 
 if not POSTGRESQL_DB_URL:
     raise RuntimeError("POSTGRESQL_DB_URL is not set")
 
-postgres_engine = create_engine(POSTGRESQL_DB_URL)
+postgresql_engine = create_engine(POSTGRESQL_DB_URL)
 PostgresqlSessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,
-    bind=postgres_engine
+    bind=postgresql_engine
 )
 
 def get_postgres_db() -> Generator[Session, None, None]:

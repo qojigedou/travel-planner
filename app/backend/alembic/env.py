@@ -1,23 +1,24 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-from dotenv import load_dotenv
+# from sqlalchemy import engine_from_config
+# from sqlalchemy import pool
+# from dotenv import load_dotenv
 from alembic import context
-import os
+# import os
 import database.models.trips, database.models.users
 from database.models.base import Base
+from database.session_postgresql import postgresql_engine
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-load_dotenv()
+# load_dotenv()
 config = context.config
 
-database_url = os.getenv("POSTGRESQL_DB_URL")
+# database_url = os.getenv("POSTGRESQL_DB_URL")
 
-if not database_url:
-    raise RuntimeError("POSTGRESQL_DB_URL is not set")
+# if not database_url:
+#     raise RuntimeError("POSTGRESQL_DB_URL is not set")
 
-config.set_main_option("sqlalchemy.url", database_url)
+# config.set_main_option("sqlalchemy.url", database_url)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -67,15 +68,15 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+
+    connectable = postgresql_engine
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            compare_type=True,
+            compare_server_default=True
         )
 
         with context.begin_transaction():

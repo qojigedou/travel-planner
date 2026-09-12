@@ -2,13 +2,13 @@ import os
 
 from fastapi import Depends
 
-from config.settings import TestingSettings, Settings, BaseAppSettings
+from config.settings import Settings, BaseAppSettings
 from security.interfaces import JWTAuthManagerInterface
 from security.token_manager import JWTAuthManager
 
 
 def get_settings() -> BaseAppSettings:
-    environment = os.getenv("ENVIRONMENT", "developing")
+    environment = os.getenv("ENVIRONMENT", "dev")
     return Settings()
 
 
