@@ -11,6 +11,9 @@ services:
     env_file:
       - .env
 
+    environment:
+      POSTGRESQL_DB_URL: postgresql://postgres_user:postgres_password@db:5432/postgres
+
     ports:
       - "8000:80"
 
