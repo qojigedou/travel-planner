@@ -36,9 +36,6 @@ def get_trips_list(
     total_items = query.count()
     trips = query.offset(offset).limit(per_page).all()
 
-    if not trips:
-        raise HTTPException(status_code=404, detail="No trips found")
-
     trip_list = [
         TripListItemSchema.model_validate(trip)
         for trip in trips
@@ -69,25 +66,31 @@ def create_trip(
     if existing_trip:
         raise HTTPException(status_code=409, detail="Trip already exists")
 
-    try:
-        geopoints = []
-        for geopoint_data in trip_data.geopoints or []:
-            geopoint = db.query(GeoPointModel).filter(GeoPointModel.name == geopoint_data.name).first()
-            if not geopoint:
-                geopoint = GeoPointModel(**geopoint_data.model_dump())
-                db.add(geopoint)
-                db.flush()
-            geopoints.append(geopoint)
-    except IntegrityError:
-        raise HTTPException(status_code=422, detail="Integrity issue")
-
     trip = TripModel(
         title=trip_data.title,
         status=trip_data.status,
         date=trip_data.date,
-        geopoints=geopoints,)
+    )
+    db.add(trip)
     try:
-        db.add(trip)
+        db.flush()  # assigns trip.id without committing yet
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=422, detail="Integrity issue while trip creation")
+
+    try:
+        for geopoint_data in trip_data.geopoints or []:
+            geopoint = GeoPointModel(
+                **geopoint_data.model_dump(),
+                trip_id=trip.id,
+            )
+            db.add(geopoint)
+        db.flush()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=422, detail="Integrity issue")
+
+    try:
         db.commit()
         db.refresh(trip)
         return TripDetailSchema.model_validate(trip)
@@ -141,3 +144,21 @@ def update_trip(id: int, trip_data: TripUpdateSchema, db: Session = Depends(get_
         raise HTTPException(status_code=400, detail="Invalid input data")
     else:
         return {"detail": "Trip updated successfully"}
+
+
+@router.delete("/trips/{trip_id}/geopoints/{geopoint_id}/")
+def remove_geopoint_from_trip(
+    trip_id: int,
+    geopoint_id: int,
+    db: Session = Depends(get_postgres_db),
+) -> None:
+    trip = db.query(TripModel).filter(TripModel.id == trip_id).first()
+    if not trip:
+        raise HTTPException(status_code=404, detail="Trip not found")
+
+    geopoint = db.query(GeoPointModel).filter(GeoPointModel.id == geopoint_id).first()
+    if not geopoint or geopoint not in trip.geopoints:
+        raise HTTPException(status_code=404, detail="Geopoint not associated with this trip")
+
+    trip.geopoints.remove(geopoint)
+    db.commit()

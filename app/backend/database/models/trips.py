@@ -62,7 +62,8 @@ class TripModel(Base):
     geopoints: Mapped[list['GeoPointModel']] = relationship(
         "GeoPointModel",
         secondary=geopoints_trips,
-        back_populates="trips"
+        back_populates="trips",
+
     )
 
     @classmethod

@@ -7,12 +7,11 @@ from typing import cast
 
 from config import get_settings, BaseAppSettings, get_jwt_auth_manager
 from database.session_postgresql import get_postgres_db
-from database.models.users import UserModel, ActivationTokenModel, PasswordResetTokenModel, RefreshTokenModel
+from database.models.users import (UserModel, PasswordResetTokenModel, RefreshTokenModel)
 from schemas.users import (
     UserRegistrationRequestSchema,
     UserRegistrationResponseSchema,
     MessageResponseSchema,
-    UserActivationRequestSchema,
     PasswordResetRequestSchema,
     PasswordResetCompleteRequestSchema,
     UserLoginResponseSchema,
@@ -44,9 +43,6 @@ def register_user(user_data: UserRegistrationRequestSchema,
         db.add(new_user)
         db.flush()
 
-        activation_token = ActivationTokenModel(user_id=new_user.id)
-        db.add(activation_token)
-
         db.commit()
         db.refresh(new_user)
     except SQLAlchemyError:
@@ -57,47 +53,15 @@ def register_user(user_data: UserRegistrationRequestSchema,
     else:
         return UserRegistrationResponseSchema.model_validate(new_user)
 
-@router.post("/activate/",
-             response_model=MessageResponseSchema,
-             status_code=status.HTTP_200_OK,
-             )
-def activate_account(
-        activation_data: UserActivationRequestSchema,
-        db: Session = Depends(get_postgres_db)
-) -> MessageResponseSchema:
-    token_record = db.query(ActivationTokenModel).join(UserModel).filter(
-        UserModel.email == activation_data.email,
-        ActivationTokenModel.token == activation_data.token
-    ).first()
-
-    if (not token_record or cast(datetime, token_record.expires).replace(tzinfo=timezone.utc) < datetime.now(timezone.utc)):
-        if token_record:
-            db.delete(token_record)
-            db.commit()
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid or expired activation token."
-        )
-
-    user = token_record.user
-    if user.is_active:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User is already active")
-
-    user.is_active = True
-    db.delete(token_record)
-    db.commit()
-
-    return MessageResponseSchema(message="User account activated successfully.")
-
 def request_password_reset_token(
         data: PasswordResetRequestSchema,
         db: Session = Depends(get_postgres_db),
 ) -> MessageResponseSchema:
     user = db.query(UserModel).filter_by(email=data.email).first()
 
-    if not user or not user.is_active:
+    if not user:
         return MessageResponseSchema(
-            message="If you are registered, you will receive an email with instructions."
+            message="Not registered user"
         )
 
     db.query(PasswordResetTokenModel).filter_by(user_id=user.id).delete()
@@ -122,7 +86,7 @@ def reset_password(
 ) -> MessageResponseSchema:
 
     user = db.query(UserModel).filter_by(email=data.email).first()
-    if not user or not user.is_active:
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid email or token."
@@ -130,7 +94,7 @@ def reset_password(
 
     token_record = db.query(PasswordResetTokenModel).filter_by(user_id=user.id).first()
 
-    expires_at = cast(datetime, token_record.expires_at).replace(tzinfo=timezone.utc)
+    expires_at = cast(datetime, token_record.expires).replace(tzinfo=timezone.utc)
 
     if not token_record or token_record.token != data.token or expires_at < datetime.now(timezone.utc):
         if token_record:
@@ -172,12 +136,6 @@ def login_user(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password.",
-        )
-
-    if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User account is not activated.",
         )
 
     jwt_refresh_token = jwt_manager.create_refresh_token({"user_id": user.id})

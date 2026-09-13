@@ -37,9 +37,6 @@ def get_geopoints_list(
     total_items = query.count()
     geopoints = query.offset(offset).limit(per_page).all()
 
-    if not geopoints:
-        raise HTTPException(status_code=404, detail="No geopoints found")
-
     geopoint_list = [
         GeoPointListItemSchema.model_validate(geopoint)
         for geopoint in geopoints
@@ -109,6 +106,7 @@ def delete_geopoint(id: int, db: Session = Depends(get_postgres_db)) -> None:
         db.commit()
         return {"detail": "Geopoint deleted"}
     except IntegrityError:
+        db.rollback()
         raise HTTPException(status_code=422, detail="Integrity issue while geopoint deletion")
 
 @router.patch("/geopoints/{id}/",)

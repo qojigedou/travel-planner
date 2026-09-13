@@ -32,7 +32,7 @@ class JWTAuthManager(JWTAuthManagerInterface):
         return self._create_token(
             data,
             self._secret_key_refresh,
-            expires_delta or timedelta(minutes=self._REFRESH_KEY_TIMEDELTA_MINUTES)
+            expires_delta or timedelta(minutes=self._REFRESH_TOKEN_TIMEDELTA_MINUTES)
         )
 
     def decode_access_token(self, token: str) -> dict:

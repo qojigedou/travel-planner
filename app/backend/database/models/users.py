@@ -27,18 +27,11 @@ class UserModel(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key = True, autoincrement=True)
     email: Mapped[str] = mapped_column(String(256), unique=True, nullable=False, index=True)
     _hashed_password: Mapped[str] = mapped_column("hashed_password", String(255), nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
     profile: Mapped[Optional["UserProfileModel"]] = relationship(
         "UserProfileModel",
-        back_populates="user",
-        cascade="all, delete-orphan"
-    )
-
-    activation_token: Mapped[Optional["ActivationTokenModel"]] = relationship(
-        "ActivationTokenModel",
         back_populates="user",
         cascade="all, delete-orphan"
     )
@@ -102,13 +95,6 @@ class TokenBaseModel(Base):
     token: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, default=generate_secure_token)
     expires: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc) + timedelta(days=1))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-
-class ActivationTokenModel(TokenBaseModel):
-    __tablename__ = "activation_tokens"
-    user: Mapped[UserModel] = relationship("UserModel", back_populates="activation_token")
-
-    __table_args__ = (UniqueConstraint("user_id"),)
-
 
 class PasswordResetTokenModel(TokenBaseModel):
     __tablename__ = "password_reset_tokens"

@@ -1,31 +1,5 @@
 services:
 
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-
-    container_name: fastapi
-    restart: unless-stopped
-
-    env_file:
-      - .env
-
-    environment:
-      POSTGRESQL_DB_URL: postgresql://postgres_user:postgres_password@db:5432/postgres
-
-    ports:
-      - "8000:80"
-
-    depends_on:
-      db:
-        condition: service_healthy
-
-    networks:
-      - network
-
-
-
   db:
     image: 'postgres:16'
     container_name: postgres
@@ -40,7 +14,6 @@ services:
       - "5432:5432"
 
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres_data:/var/lib/postgresql/data
     networks:
       - network
@@ -51,8 +24,32 @@ services:
       retries: 5
       start_period: 20s
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: fastapi
+    restart: unless-stopped
+
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: db
+    ports:
+      - "8000:80"
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    networks:
+      - network
+
 volumes:
   postgres_data:
+    driver: local
 
 networks:
   network:
+    driver: bridge
