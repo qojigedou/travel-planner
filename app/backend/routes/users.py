@@ -4,6 +4,8 @@ from fastapi import APIRouter, status, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from typing import cast
+
+from config import get_settings, BaseAppSettings, get_jwt_auth_manager
 from database.session_postgresql import get_postgres_db
 from database.models.users import UserModel, ActivationTokenModel, PasswordResetTokenModel, RefreshTokenModel
 from schemas.users import (
@@ -18,6 +20,7 @@ from schemas.users import (
     TokenRefreshRequestSchema,
     TokenRefreshResponseSchema
 )
+from security.interfaces import JWTAuthManagerInterface
 
 router = APIRouter()
 

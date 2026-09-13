@@ -56,7 +56,7 @@ class UserModel(Base):
     )
     @classmethod
     def create(cls, email: str, raw_password: str) -> "UserModel":
-        user = cls(emal=email)
+        user = cls(email=email)
         user.password = raw_password
         return user
 
