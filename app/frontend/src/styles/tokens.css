@@ -1,0 +1,285 @@
+/*
+ * Waypoint design tokens
+ *
+ *   Primitive  (--palette-*, raw values, never used by components directly)
+ *        ↓
+ *   Semantic   (--bg, --fg, --primary … purpose aliases, swapped per theme)
+ *        ↓
+ *   Component  (--btn-*, --card-*, --input-* … per-component knobs)
+ *
+ * Tailwind utilities are generated from the semantic layer in index.css.
+ */
+
+/* === PRIMITIVES ======================================================== */
+:root {
+  /* Sand — warm paper neutrals (light theme) */
+  --palette-sand-25: #fdfbf7;
+  --palette-sand-50: #f6f2ea;
+  --palette-sand-100: #efe9dd;
+  --palette-sand-200: #e3dbcb;
+  --palette-sand-300: #cfc4af;
+  --palette-sand-400: #a89c86;
+  --palette-sand-500: #7a6f5d;
+  --palette-sand-600: #5f5648;
+  --palette-sand-700: #474035;
+  --palette-sand-800: #2c2822;
+  --palette-sand-900: #1b1814;
+
+  /* Night — cool ink neutrals (dark theme) */
+  --palette-night-950: #080c15;
+  --palette-night-900: #0c111c;
+  --palette-night-850: #111827;
+  --palette-night-800: #172031;
+  --palette-night-700: #232d41;
+  --palette-night-600: #343f57;
+  --palette-night-500: #4d5872;
+  --palette-night-400: #8a93a8;
+  --palette-night-300: #b0b8c9;
+  --palette-night-200: #d6dbe4;
+
+  /* Coral — brand, sunset */
+  --palette-coral-50: #fff3ee;
+  --palette-coral-100: #ffe3d6;
+  --palette-coral-200: #fdc3ab;
+  --palette-coral-300: #f8a07e;
+  --palette-coral-400: #f07c55;
+  --palette-coral-500: #e2603a;
+  --palette-coral-600: #c4491f;
+  --palette-coral-700: #a33b18;
+  --palette-coral-800: #7f2f16;
+
+  /* Teal — sea, completion */
+  --palette-teal-50: #e9f7f3;
+  --palette-teal-100: #cdeee5;
+  --palette-teal-300: #7fd2bf;
+  --palette-teal-400: #3fb89f;
+  --palette-teal-500: #1e9c85;
+  --palette-teal-600: #13806d;
+  --palette-teal-700: #0f6457;
+
+  /* Sky — plans, the future */
+  --palette-sky-50: #edf3ff;
+  --palette-sky-100: #d9e5ff;
+  --palette-sky-300: #93b4f5;
+  --palette-sky-400: #6690ea;
+  --palette-sky-500: #4270d8;
+  --palette-sky-600: #2f58bc;
+  --palette-sky-700: #274895;
+
+  /* Amber — ratings */
+  --palette-amber-300: #fcd27a;
+  --palette-amber-400: #f7b940;
+  --palette-amber-500: #e89f16;
+
+  /* Dusk — deep tones for illustrative gradients */
+  --palette-plum-600: #8e3a55;
+  --palette-indigo-950: #211b42;
+
+  /* Red — destructive */
+  --palette-red-50: #fdeeee;
+  --palette-red-300: #f19a9a;
+  --palette-red-400: #ec6b6b;
+  --palette-red-500: #dc3f3f;
+  --palette-red-600: #bb2d2d;
+  --palette-red-700: #972525;
+
+  /* Type */
+  --typeface-display: "Fraunces Variable", "Iowan Old Style", Georgia, serif;
+  --typeface-sans: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-base: 220ms;
+  --duration-slow: 360ms;
+  --easing-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --easing-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Radius */
+  --round-sm: 0.5rem;
+  --round-md: 0.75rem;
+  --round-lg: 1rem;
+  --round-xl: 1.25rem;
+  --round-2xl: 1.75rem;
+  --round-full: 999px;
+}
+
+/* === SEMANTIC · LIGHT ================================================== */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: var(--palette-sand-50);
+  --bg-subtle: var(--palette-sand-100);
+  --surface: var(--palette-sand-25);
+  --surface-raised: #ffffff;
+  --surface-sunken: var(--palette-sand-100);
+  --overlay: rgb(27 24 20 / 0.42);
+
+  --fg: var(--palette-sand-900);
+  --fg-muted: var(--palette-sand-600);
+  --fg-subtle: var(--palette-sand-500);
+  --fg-inverse: var(--palette-sand-25);
+
+  --border: var(--palette-sand-200);
+  --border-strong: var(--palette-sand-300);
+
+  --primary: var(--palette-coral-600);
+  --primary-hover: var(--palette-coral-700);
+  --primary-fg: #ffffff;
+  --primary-soft: var(--palette-coral-50);
+  --primary-soft-fg: var(--palette-coral-700);
+
+  --ink: var(--palette-sand-900);
+  --ink-hover: var(--palette-sand-800);
+  --ink-fg: var(--palette-sand-25);
+
+  --ring: var(--palette-coral-500);
+
+  --danger: var(--palette-red-600);
+  --danger-hover: var(--palette-red-700);
+  --danger-fg: #ffffff;
+  --danger-soft: var(--palette-red-50);
+  --danger-soft-fg: var(--palette-red-700);
+
+  --success: var(--palette-teal-600);
+  --success-soft: var(--palette-teal-50);
+  --success-soft-fg: var(--palette-teal-700);
+
+  --status-planned: var(--palette-sky-500);
+  --status-planned-soft: var(--palette-sky-50);
+  --status-planned-fg: var(--palette-sky-700);
+  --status-active: var(--palette-coral-500);
+  --status-active-soft: var(--palette-coral-50);
+  --status-active-fg: var(--palette-coral-700);
+  --status-done: var(--palette-teal-500);
+  --status-done-soft: var(--palette-teal-50);
+  --status-done-fg: var(--palette-teal-700);
+  --status-done-contrast: #ffffff;
+
+  --star: var(--palette-amber-400);
+  --star-empty: var(--palette-sand-200);
+
+  --shadow-xs: 0 1px 2px rgb(44 40 34 / 0.06);
+  --shadow-sm: 0 1px 2px rgb(44 40 34 / 0.05), 0 2px 6px rgb(44 40 34 / 0.05);
+  --shadow-md: 0 2px 4px rgb(44 40 34 / 0.04), 0 8px 24px rgb(44 40 34 / 0.08);
+  --shadow-lg: 0 4px 8px rgb(44 40 34 / 0.05), 0 24px 56px rgb(44 40 34 / 0.14);
+
+  --topo-line: rgb(255 255 255 / 0.22);
+}
+
+/* === SEMANTIC · DARK =================================================== */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: var(--palette-night-900);
+  --bg-subtle: var(--palette-night-850);
+  --surface: var(--palette-night-850);
+  --surface-raised: var(--palette-night-800);
+  --surface-sunken: var(--palette-night-950);
+  --overlay: rgb(3 6 12 / 0.66);
+
+  --fg: #f3efe7;
+  --fg-muted: var(--palette-night-300);
+  --fg-subtle: var(--palette-night-400);
+  --fg-inverse: var(--palette-night-900);
+
+  --border: var(--palette-night-700);
+  --border-strong: var(--palette-night-600);
+
+  --primary: var(--palette-coral-400);
+  --primary-hover: var(--palette-coral-300);
+  --primary-fg: #1d0d06;
+  --primary-soft: rgb(240 124 85 / 0.14);
+  --primary-soft-fg: var(--palette-coral-300);
+
+  --ink: #f3efe7;
+  --ink-hover: #ffffff;
+  --ink-fg: var(--palette-night-900);
+
+  --ring: var(--palette-coral-400);
+
+  --danger: var(--palette-red-400);
+  --danger-hover: var(--palette-red-300);
+  --danger-fg: #1f0707;
+  --danger-soft: rgb(236 107 107 / 0.14);
+  --danger-soft-fg: var(--palette-red-300);
+
+  --success: var(--palette-teal-400);
+  --success-soft: rgb(63 184 159 / 0.14);
+  --success-soft-fg: var(--palette-teal-300);
+
+  --status-planned: var(--palette-sky-400);
+  --status-planned-soft: rgb(102 144 234 / 0.15);
+  --status-planned-fg: var(--palette-sky-300);
+  --status-active: var(--palette-coral-400);
+  --status-active-soft: rgb(240 124 85 / 0.15);
+  --status-active-fg: var(--palette-coral-300);
+  --status-done: var(--palette-teal-400);
+  --status-done-soft: rgb(63 184 159 / 0.15);
+  --status-done-fg: var(--palette-teal-300);
+  --status-done-contrast: #06201b;
+
+  --star: var(--palette-amber-400);
+  --star-empty: var(--palette-night-600);
+
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 6px rgb(0 0 0 / 0.2);
+  --shadow-md: 0 2px 4px rgb(0 0 0 / 0.25), 0 10px 28px rgb(0 0 0 / 0.35);
+  --shadow-lg: 0 4px 8px rgb(0 0 0 / 0.3), 0 28px 64px rgb(0 0 0 / 0.5);
+
+  --topo-line: rgb(255 255 255 / 0.14);
+}
+
+/* === COMPONENTS ======================================================== */
+:root {
+  /* Button */
+  --btn-height-sm: 2.25rem;
+  --btn-height-md: 2.75rem;
+  --btn-height-lg: 3.25rem;
+  --btn-radius: var(--round-full);
+  --btn-primary-bg: var(--primary);
+  --btn-primary-bg-hover: var(--primary-hover);
+  --btn-primary-fg: var(--primary-fg);
+  --btn-secondary-bg: var(--surface-raised);
+  --btn-secondary-bg-hover: var(--bg-subtle);
+  --btn-secondary-fg: var(--fg);
+  --btn-secondary-border: var(--border-strong);
+  --btn-ghost-bg-hover: var(--bg-subtle);
+  --btn-danger-bg: var(--danger);
+  --btn-danger-bg-hover: var(--danger-hover);
+  --btn-danger-fg: var(--danger-fg);
+
+  /* Input */
+  --input-height: 2.875rem;
+  --input-radius: var(--round-md);
+  --input-bg: var(--surface-raised);
+  --input-border: var(--border-strong);
+  --input-border-hover: var(--fg-subtle);
+  --input-placeholder: var(--fg-subtle);
+
+  /* Card */
+  --card-bg: var(--surface-raised);
+  --card-border: var(--border);
+  --card-radius: var(--round-xl);
+  --card-shadow: var(--shadow-sm);
+  --card-shadow-hover: var(--shadow-md);
+
+  /* Dialog */
+  --dialog-bg: var(--surface-raised);
+  --dialog-radius: var(--round-2xl);
+  --dialog-shadow: var(--shadow-lg);
+
+  /* Badge */
+  --badge-radius: var(--round-full);
+
+  /* Chips placed over generated trip covers — always light, in both themes */
+  --chip-on-image-bg: rgb(255 255 255 / 0.9);
+  --chip-on-image-bg-hover: #ffffff;
+  --chip-on-image-fg: var(--palette-sand-900);
+
+  /* Auth illustration panel */
+  --auth-art-bg:
+    radial-gradient(circle at 80% 18%, var(--palette-coral-200) 0%, transparent 30%),
+    radial-gradient(circle at 10% 100%, var(--palette-teal-500) 0%, transparent 45%),
+    linear-gradient(165deg, var(--palette-coral-500) 0%, var(--palette-plum-600) 48%, var(--palette-indigo-950) 100%);
+}

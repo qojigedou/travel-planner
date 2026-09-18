@@ -1,0 +1,267 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Tailwind utilities are generated from the semantic token layer, so every
+   `bg-surface`, `text-fg-muted`, `border-border` … follows the active theme. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-overlay: var(--overlay);
+
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-fg-inverse: var(--fg-inverse);
+
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-fg: var(--primary-fg);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-soft-fg: var(--primary-soft-fg);
+
+  --color-ink: var(--ink);
+  --color-ink-hover: var(--ink-hover);
+  --color-ink-fg: var(--ink-fg);
+
+  --color-ring: var(--ring);
+
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-soft-fg: var(--danger-soft-fg);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-soft-fg: var(--success-soft-fg);
+
+  --color-planned: var(--status-planned);
+  --color-planned-soft: var(--status-planned-soft);
+  --color-planned-fg: var(--status-planned-fg);
+  --color-active: var(--status-active);
+  --color-active-soft: var(--status-active-soft);
+  --color-active-fg: var(--status-active-fg);
+  --color-done: var(--status-done);
+  --color-done-soft: var(--status-done-soft);
+  --color-done-fg: var(--status-done-fg);
+  --color-done-contrast: var(--status-done-contrast);
+
+  --color-star: var(--star);
+  --color-star-empty: var(--star-empty);
+
+  --font-display: var(--typeface-display);
+  --font-sans: var(--typeface-sans);
+
+  --radius-sm: var(--round-sm);
+  --radius-md: var(--round-md);
+  --radius-lg: var(--round-lg);
+  --radius-xl: var(--round-xl);
+  --radius-2xl: var(--round-2xl);
+
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+
+  --ease-out: var(--easing-out);
+  --ease-in-out: var(--easing-in-out);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    @apply bg-bg font-sans text-fg antialiased;
+    font-feature-settings: "ss01", "cv11";
+    min-height: 100dvh;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display text-balance;
+    font-variation-settings: "SOFT" 50, "WONK" 0;
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background: var(--primary-soft);
+    color: var(--primary-soft-fg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+  }
+
+  [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+}
+
+@layer components {
+  /* Number-ish UI text uses tabular figures so values don't jump. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Contour-line texture used on trip covers and the auth panel. */
+  .topo {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240' fill='none' stroke='white' stroke-width='1.1'%3E%3Cpath d='M-20 60c40-30 80 10 120-10s70-40 160-10'/%3E%3Cpath d='M-20 90c50-26 90 16 130-6s60-34 150-4'/%3E%3Cpath d='M-20 120c46-20 96 22 136 0s60-30 144 2'/%3E%3Cpath d='M-20 150c40-16 100 26 140 4s58-24 140 8'/%3E%3Cpath d='M-20 180c52-12 96 30 138 8s62-18 142 12'/%3E%3Cpath d='M-20 210c44-8 104 30 144 10s56-12 136 14'/%3E%3Cellipse cx='176' cy='42' rx='26' ry='14'/%3E%3Cellipse cx='176' cy='42' rx='12' ry='6'/%3E%3C/svg%3E");
+    background-size: 240px 240px;
+  }
+
+  .auth-art {
+    background: var(--auth-art-bg);
+  }
+}
+
+/* Native <dialog> motion — scale/fade in, respects reduced motion. */
+dialog.wp-dialog {
+  opacity: 0;
+  transform: translateY(8px) scale(0.97);
+  transition:
+    opacity var(--duration-base) var(--easing-out),
+    transform var(--duration-base) var(--easing-out),
+    overlay var(--duration-base) allow-discrete,
+    display var(--duration-base) allow-discrete;
+}
+
+dialog.wp-dialog[open] {
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  dialog.wp-dialog[open] {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+}
+
+dialog.wp-dialog::backdrop {
+  background: var(--overlay);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  transition:
+    opacity var(--duration-base) var(--easing-out),
+    overlay var(--duration-base) allow-discrete,
+    display var(--duration-base) allow-discrete;
+}
+
+dialog.wp-dialog[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  dialog.wp-dialog[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+.animate-rise {
+  animation: rise var(--duration-slow) var(--easing-out) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-subtle) 0%, var(--surface-sunken) 40%, var(--bg-subtle) 80%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* Leaflet — blend the map into the design system. */
+.leaflet-container {
+  font-family: var(--typeface-sans);
+  background: var(--bg-subtle);
+}
+
+.leaflet-tile-pane {
+  filter: saturate(0.75) sepia(0.08);
+}
+
+.wp-map-dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(185deg) brightness(0.9) contrast(0.85) saturate(0.6);
+}
+
+.leaflet-control-attribution {
+  font-size: 10px;
+  background: color-mix(in srgb, var(--surface-raised) 85%, transparent) !important;
+  color: var(--fg-muted) !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--fg-muted) !important;
+}
+
+.leaflet-bar a {
+  background: var(--surface-raised) !important;
+  color: var(--fg) !important;
+  border-color: var(--border) !important;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--surface-raised);
+  color: var(--fg);
+  box-shadow: var(--shadow-md);
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: var(--round-md);
+}
+
+.wp-marker {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 4px;
+  transform: rotate(-45deg);
+  border: 2px solid #fff;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
+  color: #fff;
+  font: 700 12px/1 var(--typeface-sans);
+}
+
+.wp-marker > span {
+  transform: rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
