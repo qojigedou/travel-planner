@@ -1,9 +1,6 @@
-from datetime import date
-from pydantic import BaseModel, Field
 from database.models.trips import TripStatusEnum
-from typing import Optional
 
-from datetime import date
+from datetime import date as Date
 from pydantic import BaseModel, Field, model_validator
 from database.models.trips import GeoStatusEnum
 from typing import Optional
@@ -17,7 +14,7 @@ class GeoPointSchema(BaseModel):
     geo_link: str | None = Field(None, max_length=256)
     status: GeoStatusEnum
     score: Optional[float] = Field(None, ge=0, le=1)
-    addition_date: date
+    addition_date: Date
 
     model_config = {
         "from_attributes": True
@@ -30,7 +27,7 @@ class GeoPointCreateSchema(BaseModel):
     geo_link: str | None = Field(None, max_length=256)
     status: GeoStatusEnum = GeoStatusEnum.NOT_VISITED
     score: Optional[float] = Field(None, ge=0, le=1)
-    addition_date: date
+    addition_date: Date
     trip_id: Optional[int] = None
 
     @model_validator(mode="after")
@@ -50,7 +47,7 @@ class GeoPointUpdateSchema(BaseModel):
     geo_link: Optional[str] = None
     status: Optional[GeoStatusEnum] = None
     score: Optional[float] = Field(None, ge=0.0)
-    addition_date: Optional[date] = None
+    addition_date: Optional[Date] = None
 
     model_config = {
         "from_attributes": True
@@ -63,7 +60,7 @@ class GeoPointDeleteSchema(BaseModel):
     geo_link: Optional[str] = None
     status: Optional[GeoStatusEnum] = None
     score: Optional[float] = None
-    addition_date: Optional[date] = None
+    addition_date: Optional[Date] = None
 
     model_config = {
         "from_attributes": True
@@ -72,7 +69,7 @@ class GeoPointDeleteSchema(BaseModel):
 class GeoPointListItemSchema(BaseModel):
     id: int
     name: str
-    addition_date: date
+    addition_date: Date
     model_config = {
         "from_attributes": True
     }
@@ -96,7 +93,7 @@ class GeoPointDetailSchema(BaseModel):
     geo_link: str | None
     status: GeoStatusEnum
     score: float | None
-    addition_date: date
+    addition_date: Date
 
     model_config = {
         "from_attributes": True
@@ -105,7 +102,7 @@ class GeoPointDetailSchema(BaseModel):
 class TripCreateSchema(BaseModel):
     title: str = Field(..., min_length=1, max_length=256)
     status: TripStatusEnum = TripStatusEnum.PLANNED
-    date: date
+    date: Date
     geopoints: Optional[list[GeoPointCreateSchema]]
     model_config = {
         "from_attributes": True
@@ -114,9 +111,8 @@ class TripCreateSchema(BaseModel):
 class TripUpdateSchema(BaseModel):
     title: Optional[str] = None
     status: Optional[TripStatusEnum] = None
-    date: Optional[date] = None
+    date: Optional[Date] = None
     geopoints: Optional[list[GeoPointUpdateSchema]] = None
-    model_config = {}
 
     model_config = {
         "from_attributes": True
@@ -125,7 +121,7 @@ class TripUpdateSchema(BaseModel):
 class TripDeleteSchema(BaseModel):
     title: Optional[str] = None
     status: Optional[TripStatusEnum] = None
-    date: Optional[date] = None
+    date: Optional[Date] = None
 
     model_config = {
         "from_attributes": True
@@ -155,7 +151,7 @@ class TripDetailSchema(BaseModel):
     id: int
     title: str
     status: TripStatusEnum
-    date: date
+    date: Date
     geopoints: list[GeoPointSchema]
 
     model_config = {
