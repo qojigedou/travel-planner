@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
+from services.maps import extract_coords
 
 from database.models.trips import TripModel, GeoPointModel
 from schemas.trips import TripListItemSchema, TripCreateSchema, TripDeleteSchema, TripUpdateSchema, TripDetailSchema, TripListResponseSchema
@@ -80,10 +81,13 @@ def create_trip(
 
     try:
         for geopoint_data in trip_data.geopoints or []:
-            geopoint = GeoPointModel(
-                **geopoint_data.model_dump(),
-                trip_id=trip.id,
-            )
+            data = geopoint_data.model_dump(exclude={"trip_id"})
+
+            if data["geo_latitude"] is None and data["geo_link"]:
+                if coords := extract_coords(data["geo_link"]):
+                    data["geo_latitude"], data["geo_longitude"] = coords
+            geopoint = GeoPointModel(**data)
+            trip.geopoints.append(geopoint)
             db.add(geopoint)
         db.flush()
     except IntegrityError:

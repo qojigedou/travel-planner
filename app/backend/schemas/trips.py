@@ -11,7 +11,7 @@ class GeoPointSchema(BaseModel):
     name: str
     geo_latitude: Optional[float] = Field(None, ge=-90, le=90)
     geo_longitude: Optional[float] = Field(None, ge=-180, le=180)
-    geo_link: str | None = Field(None, max_length=256)
+    geo_link: str | None = Field(None, max_length=3000)
     status: GeoStatusEnum
     score: Optional[float] = Field(None, ge=0, le=1)
     addition_date: Date
@@ -24,7 +24,7 @@ class GeoPointCreateSchema(BaseModel):
     name: str = Field(..., min_length=1, max_length=256)
     geo_latitude: Optional[float] = Field(None, ge=-90, le=90)
     geo_longitude: Optional[float] = Field(None, ge=-180, le=180)
-    geo_link: str | None = Field(None, max_length=256)
+    geo_link: str | None = Field(None, max_length=3000)
     status: GeoStatusEnum = GeoStatusEnum.NOT_VISITED
     score: Optional[float] = Field(None, ge=0, le=1)
     addition_date: Date

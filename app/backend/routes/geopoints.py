@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+from services.maps import extract_coords
 
 from database.models.trips import GeoPointModel, TripModel
 from schemas.trips import GeoPointListResponseSchema, GeoPointListItemSchema, \
@@ -70,7 +71,11 @@ def create_geopoint(
         if not trip:
             raise HTTPException(status_code=404, detail="Trip not found")
 
-    geopoint = GeoPointModel(**geopoint_data.model_dump(exclude={"trip_id"}))
+    data = geopoint_data.model_dump(exclude={"trip_id"})
+    if data["geo_latitude"] is None and data["geo_link"]:
+        if coords := extract_coords(data["geo_link"]):
+            data["geo_latitude"], data["geo_longitude"] = coords
+    geopoint = GeoPointModel(**data)
 
     if trip:
         trip.geopoints.append(geopoint)
@@ -116,7 +121,11 @@ def update_geopoint(id: int, geopoint_data: GeoPointUpdateSchema, db: Session = 
     if not geopoint:
         raise HTTPException(status_code=404, detail="Geopoint not found")
 
-    for  field, value in geopoint_data.model_dump(exclude_unset=True).items():
+    updates = geopoint_data.model_dump(exclude_unset=True)
+    if updates.get("geo_link"):
+        if coords := extract_coords(updates["geo_link"]):
+            updates["geo_latitude"], updates["geo_longitude"] = coords
+    for field, value in updates.items():
         setattr(geopoint, field, value)
 
     try:
