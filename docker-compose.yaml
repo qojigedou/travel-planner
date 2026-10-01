@@ -1,0 +1,96 @@
+services:
+
+  db:
+    image: 'postgres:16'
+    container_name: postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -h 127.0.0.1 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  migrate:
+    build:
+      context: ./app/backend
+      dockerfile: Dockerfile
+    container_name: migrate
+    env_file:
+      - ./app/backend/.env
+    environment:
+      POSTGRES_HOST: db
+    command: [ "alembic", "upgrade", "head" ]
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - network
+    restart: "no"
+
+  api:
+    build:
+      context: ./app/backend
+      dockerfile: Dockerfile
+
+    container_name: fastapi
+    restart: unless-stopped
+
+    env_file:
+      - ./app/backend/.env
+    environment:
+      POSTGRES_HOST: db
+    ports:
+      - "80:80"
+
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+    networks:
+      - network
+
+  frontend:
+    build:
+      context: ./app/frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_DOCS_URL: ${VITE_API_DOCS_URL:-http://localhost:80/docs}
+
+    container_name: frontend
+    restart: unless-stopped
+
+    environment:
+      API_UPSTREAM: http://api:80
+
+    ports:
+      - "3000:80"
+
+    depends_on:
+      - api
+
+    networks:
+      - network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  network:
+    driver: bridge
