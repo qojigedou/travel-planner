@@ -1,9 +1,10 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, status, Depends, HTTPException
+from fastapi import APIRouter, status, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from typing import cast
+from limiter import limiter
 
 from config import get_settings, BaseAppSettings, get_jwt_auth_manager
 from database.session_postgresql import get_postgres_db
@@ -124,7 +125,9 @@ def reset_password(
     description="Authenticate a user and return access and refresh tokens.",
     status_code=status.HTTP_201_CREATED,
 )
+@limiter.limit("5/minute")
 def login_user(
+        request: Request,
         login_data: UserLoginRequestSchema,
         db: Session = Depends(get_postgres_db),
         settings: BaseAppSettings = Depends(get_settings),
